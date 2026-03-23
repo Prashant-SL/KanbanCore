@@ -8,4 +8,8 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt && pip install watchfiles
 
-CMD ["uvicorn", "app.main:app", "--reload", "--reload-dir", "/app", "--host", "0.0.0.0", "--port", "8002"]
+COPY ./app ./app
+
+EXPOSE 8002
+
+CMD ["uvicorn", "app.main:app", "/app", "--host", "0.0.0.0", "--port", "8002"]

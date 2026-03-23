@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+
+  # gateway-service:
+  #   build: ./services/gateway
+  #   container_name: gateway-service
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ./services/gateway:/app
+  #   env_file:
+  #     - ./services/gateway/.env
+
+  auth-service:
+    build: ./services/auth
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./services/auth:/app
+    env_file:
+      - ./services/auth/.env
+
+  board-service:
+    build: ./services/board
+    container_name: board-service
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./services/board:/app
+    env_file:
+      - ./services/board/.env

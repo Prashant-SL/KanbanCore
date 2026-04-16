@@ -14,11 +14,11 @@ app.state.limiter = limiter
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",  # Next.js dev
-        # "https://abc.com", # production frontend
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
     ],
     allow_credentials=True,
-    allow_methods=["GET, POST"],
+    allow_methods=["*"],  # Fixed: changed ["GET, POST"] to ["*"] to allow OPTIONS preflight requests
     allow_headers=["*"],
 )
 

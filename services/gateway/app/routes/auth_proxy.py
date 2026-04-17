@@ -13,11 +13,11 @@ async def auth_proxy(path: str, request: Request):
     headers = dict(request.headers)
     headers.pop("host", None)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
 
         response = await client.request(
             request.method,
-            f"{AUTH_SERVICE}/{path}",
+            f"{AUTH_SERVICE.rstrip('/')}/{path}",
             headers=headers,
             content=await request.body()
         )

@@ -30,11 +30,11 @@ async def board_proxy(path: str, request: Request):
     headers = dict(request.headers)
     headers.pop("host", None)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=60.0) as client:
 
             response = await client.request(
             method=request.method,
-            url=f"{BOARD_SERVICE}/{path}",
+            url=f"{BOARD_SERVICE.rstrip('/')}/{path}",
             headers=headers,
             params=request.query_params,
             content=await request.body()

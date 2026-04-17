@@ -14,17 +14,22 @@ router = APIRouter()
 
 @router.post("/register")
 def register(user: UserRegister, db: Session = Depends(get_db)):
-    
     try:
         existing_user = db.query(User).filter(
-            User.username == user.username
+            (User.username == user.username) | (User.email == user.email)
         ).first()
         
         if existing_user:
-            raise HTTPException(
-                status_code=400,
-                detail="Username already exists"
-            )
+            if existing_user.username == user.username:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Username already exists"
+                )
+            if existing_user.email == user.email:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Email already exists"
+                )
 
         new_user = User(
             username=user.username,
@@ -37,12 +42,16 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
         db.refresh(new_user)
 
         return {"message": "Registration successful"}
-    except:
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Database Error: {e}")
+        db.rollback()
         raise HTTPException(
                 status_code=400,
-                detail="Error registering user"
+                detail=f"Error registering user: {str(e)}"
             )
-        
+            
 @router.get("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(

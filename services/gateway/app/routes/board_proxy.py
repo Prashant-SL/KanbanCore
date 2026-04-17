@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, HTTPException
 import httpx
 
-from app.config import BOARD_SERVICE
+from app.config import BOARD_SERVICE, RATE_LIMIT
 from app.rate_limit import limiter
 from app.security import verify_jwt
 
@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.api_route("/boards/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
-@limiter.limit("100/minute")
+@limiter.limit(RATE_LIMIT)
 async def board_proxy(path: str, request: Request):
 
     auth_header = request.headers.get("Authorization")

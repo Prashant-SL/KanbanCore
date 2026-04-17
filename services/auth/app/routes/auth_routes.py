@@ -52,7 +52,7 @@ def register(user: UserRegister, db: Session = Depends(get_db)):
                 detail=f"Error registering user: {str(e)}"
             )
             
-@router.get("/login")
+@router.post("/login")
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(
         User.username == user.username  # compare the current entered username with the username of records in User table

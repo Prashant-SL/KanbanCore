@@ -8,7 +8,7 @@ from app.security import verify_jwt
 router = APIRouter()
 
 
-@router.api_route("/{path:path}", methods=["GET", "POST"], tags=["Board Proxy"])
+@router.api_route("/boards/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
 @limiter.limit("100/minute")
 async def board_proxy(path: str, request: Request):
 
@@ -27,12 +27,15 @@ async def board_proxy(path: str, request: Request):
 
     verify_jwt(token)
 
+    headers = dict(request.headers)
+    headers.pop("host", None)
+
     async with httpx.AsyncClient() as client:
 
             response = await client.request(
             method=request.method,
             url=f"{BOARD_SERVICE}/{path}",
-            headers=dict(request.headers),
+            headers=headers,
             params=request.query_params,
             content=await request.body()
         )

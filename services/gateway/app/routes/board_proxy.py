@@ -8,9 +8,12 @@ from app.security import verify_jwt
 router = APIRouter()
 
 
+@router.api_route("/boards", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
 @router.api_route("/boards/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
+@router.api_route("/tasks", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
+@router.api_route("/tasks/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"], tags=["Board Proxy"])
 @limiter.limit(RATE_LIMIT)
-async def board_proxy(path: str, request: Request):
+async def board_proxy(request: Request, path: str = ""):
 
     auth_header = request.headers.get("Authorization")
 
@@ -30,11 +33,15 @@ async def board_proxy(path: str, request: Request):
     headers = dict(request.headers)
     headers.pop("host", None)
 
+    # Use the original request path to forward exactly what was requested
+    forward_path = request.url.path
+    url = f"{BOARD_SERVICE.rstrip('/')}{forward_path}"
+
     async with httpx.AsyncClient(timeout=60.0) as client:
 
-            response = await client.request(
+        response = await client.request(
             method=request.method,
-            url=f"{BOARD_SERVICE.rstrip('/')}/{path}",
+            url=url,
             headers=headers,
             params=request.query_params,
             content=await request.body()
